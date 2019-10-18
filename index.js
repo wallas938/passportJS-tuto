@@ -31,6 +31,7 @@ app.use(methodOverride("_method"));
 app.use(express.urlencoded({
     extended: false
 }))
+app.use(["/login", "/register"], checkNotAuthenticated);
 
 app.set('view-engine', 'ejs');
 
@@ -41,21 +42,21 @@ app.delete('/logout', (req, res, next) => {
     res.redirect('/login');
 })
 
-app.get('/login', checkNotAuthenticated, (req, res, next) => {
+app.get('/login', (req, res, next) => {
     res.render("login.ejs")
 });
 
-app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
+app.post('/login', passport.authenticate('local', {
     successRedirect: '/profile',
     failureRedirect: '/login',
     failureFlash: true
 }));
 
-app.get('/register', checkNotAuthenticated, (req, res, next) => {
+app.get('/register', (req, res, next) => {
     res.render("register.ejs")
 });
 
-app.post('/register', checkNotAuthenticated, async (req, res, next) => {
+app.post('/register', async (req, res, next) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         users.push({
